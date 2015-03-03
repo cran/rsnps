@@ -5,7 +5,7 @@
 #' Default is 10 rows.
 #' @param filepath If none is given the file is saved to a temporary file, which will
 #' be lost after your session is closed. Save to a file if you want to access it later.
-#' @param ... Further args passed on to download.file
+#' @param ... Further args passed on to \code{\link{download.file}}
 #' @return Dataset for a single user.
 #' @details Beware, not setting the rows parameter means that you download the entire
 #' file, which can be large (e.g., 15MB), and so take a while to download depending
@@ -37,7 +37,7 @@ fetch_genotypes <- function(url, rows = 10, filepath = NULL, ...)
   if(is.null(filepath)) 
     filepath <- tempfile(fileext = ".txt")
   download.file(url, method = "wget", destfile = filepath, ...)
-  df <- read.table(file, skip=15, sep="\t", nrows = rows, header=FALSE)
+  df <- read.table(filepath, skip=15, sep="\t", nrows = rows, header=FALSE)
   names(df) <- c("rsid","chromsome","position","genotype")
   df
   #   }

@@ -5,6 +5,8 @@
 #' of SNPs submitted.
 #' 
 #' @param SNPs A vector of SNPs (rs numbers).
+#' @param ... Further named parameters passed on to \code{\link[httr]{config}} to debug curl.
+#' See examples.
 #' @export
 #' @return A dataframe with columns:
 #' \itemize{
@@ -33,15 +35,34 @@
 #' \item \code{BP:} The chromosomal position, in base pairs, of the marker, 
 #' as aligned with the current genome used by dbSNP.
 #' }
-#' @seealso \url{http://www.ncbi.nlm.nih.gov/projects/SNP/}
+#' @references \url{http://www.ncbi.nlm.nih.gov/projects/SNP/}
+#' @details Note that you are limited in the number of SNPs you pass in to one request because
+#' URLs can only be so long. Around 600 is likely the max you can pass in, though may be somewhat
+#' more. Break up your vector of SNP codes into pieces of 600 or less and do repeated requests 
+#' to get all data.
 #' @examples \dontrun{
 #' ## an example with both merged SNPs, non-SNV SNPs, regular SNPs,
 #' ## SNPs not found, microsatellite
 #' SNPs <- c("rs332", "rs420358", "rs1837253", "rs1209415715", "rs111068718")
 #' NCBI_snp_query(SNPs)
 #' NCBI_snp_query("123456") ##invalid: must prefix with 'rs'
+#' NCBI_snp_query("rs420358")
+#' NCBI_snp_query("rs332") # warning that its merged into another, try that
+#' NCBI_snp_query("rs121909001") 
+#' NCBI_snp_query("rs1837253")
+#' NCBI_snp_query("rs1209415715") # warning that no data available, returns 0 length data.frame
+#' NCBI_snp_query("rs111068718") # warning that chromosomal information may be unmapped
+#' 
+#' NCBI_snp_query(SNPs='rs9970807')$BP
+#' 
+#' # Curl debugging
+#' NCBI_snp_query("rs121909001")
+#' library("httr")
+#' NCBI_snp_query("rs121909001", config=verbose())
+#' snps <- c("rs332", "rs420358", "rs1837253", "rs1209415715", "rs111068718")
+#' NCBI_snp_query(snps, config=progress())
 #' }
-NCBI_snp_query <- function(SNPs) {
+NCBI_snp_query <- function(SNPs, ...) {
   
   ## ensure these are rs numbers of the form rs[0-9]+
   tmp <- sapply( SNPs, function(x) { grep( "^rs[0-9]+$", x) } )
@@ -51,10 +72,14 @@ NCBI_snp_query <- function(SNPs) {
          "'rs', e.g. rs420358")
   }
   
-  query <- "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=snp&mode=xml&id="
-  query <- paste( sep='', query, paste( SNPs, collapse="," ) )
+  # query <- "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=snp&mode=xml&id="
+  # query <- paste( sep='', query, paste( SNPs, collapse="," ) )
   
-  xml <- getURL( query )
+  url <- "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+  res <- GET(url, query = list(db = 'snp', mode = 'xml', id = paste( SNPs, collapse=",")), ...)
+  stop_for_status(res)
+  xml <- content(res, "text")
+  # xml <- getURL( query )
   xml_parsed <- xmlInternalTreeParse( xml )
   xml_list_ <- xmlToList( xml_parsed )
   
@@ -122,18 +147,25 @@ NCBI_snp_query <- function(SNPs) {
       if( tmp[2] != "forward" ) {
         tmp[1] <- flip( tmp[1], sep="/" )
       }
-      alleles_split <- unlist( strsplit( tmp[1], "/" ) )
+      alleles_split <- strsplit( tmp[1], "/" )[[1]]
       
       ## check which of the two alleles grabbed is actually the minor allele
       ## we might have to 'flip' the minor allele if there is no match
       maf_allele <- my_list$Frequency['allele']
+      if(is.null(maf_allele)){
+        maf_allele <- alleles <- strsplit(my_list$Sequence$Observed, "/")[[1]]
+        my_major <- alleles[1]
+        my_minor <- alleles[2]
+        my_freq <- NA
+      } else {
+        my_minor <- alleles_split[ maf_allele == alleles_split ]
+        my_major <- alleles_split[ maf_allele != alleles_split ]        
+        my_freq <- my_list$Frequency["freq"]
+      }
       if( all(maf_allele != alleles_split) ) {
         maf_allele <- swap( maf_allele, c("A", "C", "G", "T"), c("T", "G", "C", "A") )
       }
-      
-      my_minor <- alleles_split[ maf_allele == alleles_split ]
-      my_major <- alleles_split[ maf_allele != alleles_split ]
-      my_freq <- my_list$Frequency["freq"]      
+
     } else { ## handle the others in a generic way; maybe specialize later
       my_minor <- NA
       my_major <- NA
@@ -150,7 +182,7 @@ NCBI_snp_query <- function(SNPs) {
     
     out[i, ] <- c( 
       SNPs[i], as.integer(my_chr), my_snp, unname(my_snpClass),
-      unname(my_gene), unname(alleles), unname(my_major), unname(my_minor),
+      unname(my_gene), paste0(unname(alleles),collapse=","), unname(my_major), unname(my_minor),
       as.numeric(my_freq), as.integer(my_pos)
     )
     
