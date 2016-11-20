@@ -88,5 +88,15 @@ split_to_df <- function(x, sep, fixed=FALSE, perl=TRUE, useBytes=FALSE, names=NU
 #' @export
 #' @keywords internal
 tryget <- function(x) {
-  return( tryCatch( return(x), error=function(e) return(NA) ) )
+  return( tryCatch( return(x), error = function(e) return(NA) ) )
 }
+
+strtrim <- function(str) {
+  gsub("^\\s+|\\s+$", "", str)
+}
+
+rsnps_comp <- function(x) Filter(Negate(is.null), x)
+
+osnp_base <- function() "https://opensnp.org/"
+
+cuf8 <- function(x) httr::content(x, "text", encoding = "UTF-8")
