@@ -13,10 +13,9 @@ swap(vec, from, to = names(from), ...)
 
 \item{to}{A vector of elements to map to.}
 
-\item{...}{Optional arguments passed to \code{\link{match}}.}
+\item{...}{Optional arguments passed to \code{\link[=match]{match()}}}
 }
 \description{
 Swap Elements in a Vector
 }
 \keyword{internal}
-

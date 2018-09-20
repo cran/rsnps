@@ -2,13 +2,34 @@
 % Please edit documentation in R/rsnps-package.R
 \docType{package}
 \name{rsnps-package}
-\alias{rsnps}
 \alias{rsnps-package}
+\alias{rsnps}
 \title{Get SNP (Single-Nucleotide Polymorphism) Data on the Web}
 \description{
 This package gives you access to data from OpenSNP (https://opensnp.org)
 via their API (https://opensnp.org/faq#api).
 }
+\section{NCBI Authenication}{
+
+This applies the the functions \code{\link[=ncbi_snp_query]{ncbi_snp_query()}},
+\code{\link[=ncbi_snp_query2]{ncbi_snp_query2()}}, and \code{\link[=ncbi_snp_summary]{ncbi_snp_summary()}}:
+
+You can optionally use an API key, if you do it will
+allow higher rate limits (more requests per time period)
+
+If you don't have an NCBI API key, get one at
+https://www.ncbi.nlm.nih.gov/account/
+
+Create your key from your account. After generating your key
+set an environment variable as \code{ENTREZ_KEY} in .Renviron.
+
+\code{ENTREZ_KEY='youractualkeynotthisstring'}
+
+You can optionally pass in your API key to the key parameter in NCBI
+functions in this package. However, it's much better from a security
+perspective to set an environment variable.
+}
+
 \author{
 Scott Chamberlain \email{myrmecocystus@gmail.com}
 
@@ -16,4 +37,3 @@ Kevin Ushey \email{kevinushey@gmail.com}
 
 Hao Zhu \email{haozhu233@gmail.com}
 }
-

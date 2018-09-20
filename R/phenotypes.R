@@ -1,9 +1,10 @@
-#' Get phenotype data for one or multiple users.
+#' Get openSNP phenotype data for one or multiple users.
 #'
 #' @export
+#' @family opensnp-fxns 
 #' @param userid ID of openSNP user.
-#' @param df Return data.frame (TRUE) or not (FALSE) - default = FALSE.
-#' @param ... Curl options passed on to \code{\link[httr]{GET}}.
+#' @param df Return data.frame (`TRUE`) or not (`FALSE`). Default: `FALSE`
+#' @param ... Curl options passed on to [crul::HttpClient]
 #' @return List of phenotypes for specified user(s).
 #'
 #' @examples \dontrun{
@@ -17,17 +18,13 @@
 #' head(df); tail(df)
 #'
 #' # pass on curl options
-#' library("httr")
-#' # phenotypes(1, config=c(verbose(), timeout(1)))
-#' phenotypes(1, config=verbose())
+#' phenotypes(1, verbose = TRUE)
 #' }
 
 phenotypes <- function(userid = NA, df = FALSE, ...) {
   url2 <- paste0(paste0(osnp_base(), "phenotypes/json/"), userid, '.json')
-  message(url2)
-  res <- GET(url2, ...)
-  stop_for_status(res)
-  out <- jsonlite::fromJSON(cuf8(res), FALSE)
+  res <- os_GET(url2, list(), ...)
+  out <- jsonlite::fromJSON(res, FALSE)
 
   userid <- gsub("-", ",", userid)
 

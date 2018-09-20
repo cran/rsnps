@@ -10,9 +10,9 @@ split_to_df(x, sep, fixed = FALSE, perl = TRUE, useBytes = FALSE,
 \arguments{
 \item{x}{a vector of strings.}
 
-\item{sep}{the delimiter / \code{\link{regex}} you wish to split your strings on.}
+\item{sep}{the delimiter / \link{regex} you wish to split your strings on.}
 
-\item{fixed}{logical. If \code{TRUE}, we match \code{sep} exactly; 
+\item{fixed}{logical. If \code{TRUE}, we match \code{sep} exactly;
 otherwise, we use regular expressions. Has priority over \code{perl}.}
 
 \item{perl}{logical. Should perl-compatible regexps be used?}
@@ -23,13 +23,14 @@ character-by-character.}
 \item{names}{optional: a vector of names to pass to the returned \code{data.frame}.}
 }
 \description{
-This function takes a vector of strings following a regular 
+This function takes a vector of strings following a regular
 structure, and converts that vector into a \code{data.frame}, split
-on that delimiter. A nice wrapper to \code{\link{strsplit}}, essentially 
-- the primary bonus is the automatic coersion to a \code{data.frame}.
+on that delimiter. A nice wrapper to \code{\link[=strsplit]{strsplit()}}, essentially
+\itemize{
+\item the primary bonus is the automatic coersion to a \code{data.frame}.
+}
 }
 \seealso{
-\code{\link{strsplit}}
+\code{\link[=strsplit]{strsplit()}}
 }
 \keyword{internal}
-

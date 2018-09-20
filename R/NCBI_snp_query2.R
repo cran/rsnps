@@ -1,19 +1,16 @@
 #' Query NCBI's dbSNP for information on a set of SNPs
 #' 
-#' 
 #' @export
 #' @param SNPs A vector of SNPs (rs numbers).
-#' @param ... Further named parameters passed on to 
-#' \code{\link[httr]{config}} to debug curl.
+#' @param key (character) NCBI Entrez API key. optional. 
+#' See "NCBI Authenication" in [rsnps-package]
+#' @param ... Curl options passed on to [crul::HttpClient]
 #' 
-#' @note \code{ncbi_snp_query2} is a synonym of \code{NCBI_snp_query2} - we'll 
-#' make \code{NCBI_snp_query2} defunct in the next version
-#' 
-#' @seealso \code{\link{ncbi_snp_query}}
+#' @seealso [ncbi_snp_query()]
 #' 
 #' @examples \dontrun{
-#' SNPs <- c("rs332", "rs420358", "rs1837253", "rs1209415715", "rs111068718")
-#' ncbi_snp_query2(SNPs)
+#' x <- c("rs332", "rs420358", "rs1837253", "rs1209415715", "rs111068718")
+#' ncbi_snp_query2(x)
 #' # ncbi_snp_query2("123456") ## invalid: must prefix with 'rs'
 #' ncbi_snp_query2("rs420358")
 #' ncbi_snp_query2("rs332") # warning, merged into new one
@@ -22,34 +19,48 @@
 #' ncbi_snp_query2("rs1209415715") # no data available
 #' ncbi_snp_query2("rs111068718") # chromosomal information may be unmapped
 #' }
-
-NCBI_snp_query2 <- function(SNPs, ...) {
-  if (grepl("NCBI", deparse(sys.call()))) {
-    .Deprecated("ncbi_snp_query2", package = "rsnps", 
-      "use ncbi_snp_query2 instead - NCBI_snp_query2 removed in next version")
-  }
-  
-  tmp <- sapply( SNPs, function(x) { 
-    grep( "^rs[0-9]+$", x) 
-  })
+ncbi_snp_query2 <- function(SNPs, key = NULL, ...) {
+  tmp <- sapply( SNPs, function(x) grep( "^rs[0-9]+$", x))
   if ( any( sapply( tmp, length ) == 0 ) ) {
     stop("not all items supplied are prefixed with 'rs';\n",
          "you must supply rs numbers and they should be prefixed with ",
          "'rs', e.g. rs420358")
   }
   url <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-  res <- GET(url, query = list(db = 'snp', retmode = 'flt', rettype = 'flt', 
-                               id = paste( SNPs, collapse = ",")), ...)
-  stop_for_status(res)
-  tmp <- cuf8(res)
+  key <- check_key(key %||% "")
+  quer <- rsnps_comp(list(db = 'snp', retmode = 'flt', rettype = 'flt', 
+    api_key = key))
+
+  cli <- crul::HttpClient$new(url = url, opts = list(...))
+  
+  if (length(SNPs) > 190) {
+    res <- cli$post(query = quer, 
+      body = list(id = paste(SNPs, collapse = ",")))
+  } else {
+    quer$id <- paste(SNPs, collapse = ",")
+    res <- cli$get(query = quer)
+  }
+  
+  res$raise_for_status()
+  tmp <- res$parse("UTF-8")
   tmpsplit <- strsplit(tmp, "\n\n")[[1]]
-  dat <- stats::setNames(lapply(tmpsplit, parse_data), SNPs)
+  tmpsplit <- tmpsplit[tmpsplit != ""]
+  dat <- lapply(tmpsplit, parse_data)
+  dat_names <- unlist(lapply(dat, function(x){x$rs$snp}))
+  names(dat) <- dat_names
+  if (length(setdiff(SNPs, dat_names)) != 0) {
+    warning(paste0(
+      "Query results from SNPs ", 
+      paste0(setdiff(SNPs, dat_names), collapse = ", "),
+      " are empty."
+      ))
+  }
   dfs <- list()
   for (i in seq_along(dat)) {
     z <- dat[[i]]
     ctg <- z$ctg
     dfs[[i]] <- data.frame(query = names(dat[i]), 
-                           marker = z$rs$snp,
+                           marker = rn(z$rs$snp),
                            organism = rn(z$rs$organism), 
                            chromosome = rn(ctg$chromosome),
                            assembly = rn(ctg$groupLabel),
@@ -65,10 +76,6 @@ NCBI_snp_query2 <- function(SNPs, ...) {
   return( structure(list(summary = dfs, data = dat), class = "dbsnp") )
   Sys.sleep(0.33)
 }
-
-#' @export
-#' @rdname NCBI_snp_query2
-ncbi_snp_query2 <- NCBI_snp_query2
 
 #' @export
 print.dbsnp <- function(x, ...) {

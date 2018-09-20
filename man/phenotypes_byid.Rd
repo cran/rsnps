@@ -2,25 +2,25 @@
 % Please edit documentation in R/phenotypes_byid.R
 \name{phenotypes_byid}
 \alias{phenotypes_byid}
-\title{Get all known variations and all users sharing that phenotype for 
+\title{Get all openSNP known variations and all users sharing that phenotype for
 one phenotype(-ID).}
 \usage{
-phenotypes_byid(phenotypeid = NA, return_ = c("description", "knownvars",
-  "users"), ...)
+phenotypes_byid(phenotypeid = NA, return_ = c("description",
+  "knownvars", "users"), ...)
 }
 \arguments{
 \item{phenotypeid}{ID of openSNP phenotype.}
 
-\item{return_}{Return data.frame (TRUE) or not (FALSE) - default = FALSE.}
+\item{return_}{Return data.frame (\code{TRUE}) or not (\code{FALSE}). Default: \code{FALSE}}
 
-\item{...}{Curl options passed on to \code{\link[httr]{GET}}.}
+\item{...}{Curl options passed on to \link[crul:HttpClient]{crul::HttpClient}}
 }
 \value{
-List of description of phenotype, list of known variants, or 
+List of description of phenotype, list of known variants, or
 data.frame of variants for each user with that phenotype.
 }
 \description{
-Get all known variations and all users sharing that phenotype for 
+Get all openSNP known variations and all users sharing that phenotype for
 one phenotype(-ID).
 }
 \examples{
@@ -30,10 +30,14 @@ phenotypes_byid(phenotypeid=12, return_ = 'knownvars')
 phenotypes_byid(phenotypeid=12, return_ = 'users')
 
 # pass on curl options
-library("httr")
-phenotypes_byid(phenotypeid=12, return_ = 'desc', 
-  config=c(verbose(), timeout(1)))
-phenotypes_byid(phenotypeid=12, return_ = 'desc', config=verbose())
+phenotypes_byid(phenotypeid=12, return_ = 'desc', verbose = TRUE)
 }
 }
-
+\seealso{
+Other opensnp-fxns: \code{\link{allgensnp}},
+  \code{\link{allphenotypes}}, \code{\link{annotations}},
+  \code{\link{download_users}},
+  \code{\link{fetch_genotypes}}, \code{\link{genotypes}},
+  \code{\link{phenotypes}}, \code{\link{users}}
+}
+\concept{opensnp-fxns}

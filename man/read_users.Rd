@@ -13,7 +13,7 @@ read_users(name = NULL, id = NULL, path = NULL, ...)
 
 \item{path}{Path to file to read from.}
 
-\item{...}{Parameters passed on to \code{\link{read.table}}}
+\item{...}{Parameters passed on to \code{\link[=read.table]{read.table()}}}
 }
 \value{
 A data.frame.
@@ -36,4 +36,3 @@ the path.
 # dat <- read_users(id = 285)
 }
 }
-

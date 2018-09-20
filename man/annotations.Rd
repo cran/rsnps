@@ -2,8 +2,8 @@
 % Please edit documentation in R/annotations.R
 \name{annotations}
 \alias{annotations}
-\title{Get all phenotypes, their variations, and how many users have data
-		available for a given phenotype.}
+\title{Get all openSNP phenotypes, their variations, and how many users have data
+available for a given phenotype.}
 \usage{
 annotations(snp = NA, output = c("all", "plos", "mendeley", "snpedia",
   "metadata"), ...)
@@ -15,15 +15,15 @@ annotations(snp = NA, output = c("all", "plos", "mendeley", "snpedia",
 are: 'plos', 'mendeley', 'snpedia', 'metadata'). 'metadata' gives the
 metadata for the response.}
 
-\item{...}{Curl options passed on to \code{\link[httr]{GET}}.}
+\item{...}{Curl options passed on to \link[crul:HttpClient]{crul::HttpClient}}
 }
 \value{
-Data.frame of results.
+data.frame of results
 }
 \description{
 Either return data.frame with all results, or output a list, then call
-		the charicteristic by id (paramater = "id") or 
-		name (paramater = "characteristic").
+the charicteristic by id (paramater = "id") or
+name (paramater = "characteristic").
 }
 \examples{
 \dontrun{
@@ -41,4 +41,12 @@ annotations(snp = 'rs7903146', output = 'snpedia')
 annotations(snp = 'rs7903146', output = 'all') 
 }
 }
-
+\seealso{
+Other opensnp-fxns: \code{\link{allgensnp}},
+  \code{\link{allphenotypes}},
+  \code{\link{download_users}},
+  \code{\link{fetch_genotypes}}, \code{\link{genotypes}},
+  \code{\link{phenotypes_byid}}, \code{\link{phenotypes}},
+  \code{\link{users}}
+}
+\concept{opensnp-fxns}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/genotypes.R
 \name{genotypes}
 \alias{genotypes}
-\title{Get genotype data for one or multiple users.}
+\title{Get openSNP genotype data for one or multiple users.}
 \usage{
 genotypes(snp = NA, userid = NA, df = FALSE, ...)
 }
@@ -11,16 +11,16 @@ genotypes(snp = NA, userid = NA, df = FALSE, ...)
 
 \item{userid}{ID of openSNP user.}
 
-\item{df}{Return data.frame (TRUE) or not (FALSE) - default = FALSE.}
+\item{df}{Return data.frame (\code{TRUE}) or not (\code{FALSE}). Default: \code{FALSE}}
 
-\item{...}{Curl options passed on to \code{\link[httr]{GET}}.}
+\item{...}{Curl options passed on to \link[crul:HttpClient]{crul::HttpClient}]}
 }
 \value{
-List (or data.frame) of genotypes for specified user(s) at a 
+List (or data.frame) of genotypes for specified user(s) at a
 certain SNP.
 }
 \description{
-Get genotype data for one or multiple users.
+Get openSNP genotype data for one or multiple users.
 }
 \examples{
 \dontrun{
@@ -29,4 +29,12 @@ genotypes('rs9939609', userid='1,6,8', df=TRUE)
 genotypes('rs9939609', userid='1-2', df=FALSE)
 }
 }
-
+\seealso{
+Other opensnp-fxns: \code{\link{allgensnp}},
+  \code{\link{allphenotypes}}, \code{\link{annotations}},
+  \code{\link{download_users}},
+  \code{\link{fetch_genotypes}},
+  \code{\link{phenotypes_byid}}, \code{\link{phenotypes}},
+  \code{\link{users}}
+}
+\concept{opensnp-fxns}

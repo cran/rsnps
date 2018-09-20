@@ -1,4 +1,4 @@
-#' Get all phenotypes, their variations, and how many users have data
+#' Get all openSNP phenotypes, their variations, and how many users have data
 #' 		available for a given phenotype.
 #'
 #' Either return data.frame with all results, or output a list, then call
@@ -6,12 +6,13 @@
 #' 		name (paramater = "characteristic").
 #'
 #' @export
+#' @family opensnp-fxns
 #' @param snp SNP name.
 #' @param output Name the source or sources you want annotations from (options
 #' 		are: 'plos', 'mendeley', 'snpedia', 'metadata'). 'metadata' gives the
 #' 		metadata for the response.
-#' @param ... Curl options passed on to \code{\link[httr]{GET}}.
-#' @return Data.frame of results.
+#' @param ... Curl options passed on to [crul::HttpClient]
+#' @return data.frame of results
 #' @examples \dontrun{
 #' # Get all data
 #' ## get just the metadata
@@ -30,10 +31,8 @@ annotations <- function(snp = NA,
   output = c('all','plos','mendeley','snpedia','metadata'), ...) {
   
   url <- paste0(osnp_base(), "snps/json/annotation/", snp, '.json')
-  message(url)
-  res <- httr::GET(url, ...)
-  httr::stop_for_status(res)
-  out <- jsonlite::fromJSON(cuf8(res), FALSE)
+  out <- os_GET(url, list(), ...)
+  out <- jsonlite::fromJSON(out, FALSE)
   source_ <- match.arg(output, c('all','plos','mendeley','snpedia','metadata'), 
                        FALSE)
 

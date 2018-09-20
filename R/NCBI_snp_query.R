@@ -3,47 +3,50 @@
 #' This function queries NCBI's dbSNP for information related to the latest
 #' dbSNP build and latest reference genome for information on the vector
 #' of SNPs submitted.
+#' 
+#' This function currently pulling data for Assembly 38 - in particular
+#' note that if you think the BP position is wrong, that you may be 
+#' hoping for the BP position for a different Assembly. With ENTREZ
+#' we cannot specify which assembly to pull data from, so it's stuck 
+#' with 38.
 #'
-#' @param SNPs A vector of SNPs (rs numbers).
-#' @param ... Further named parameters passed on to \code{\link[httr]{config}} 
-#' to debug curl. See examples.
 #' @export
+#' @param SNPs (character) A vector of SNPs (rs numbers).
+#' @param key (character) NCBI Entrez API key. optional. 
+#' See "NCBI Authenication" in [rsnps-package]
+#' @param ... Curl options passed on to [crul::HttpClient]
 #' @return A dataframe with columns:
-#' \itemize{
-#' \item \code{Query:} The rs ID that was queried.
-#' \item \code{Chromosome:} The chromosome that the marker lies on.
-#' \item \code{Marker:} The name of the marker. If the rs ID queried
+#' 
+#' - Query: The rs ID that was queried.
+#' - Chromosome: The chromosome that the marker lies on.
+#' - Marker: The name of the marker. If the rs ID queried
 #' has been merged, the up-to-date name of the marker is returned here, and
 #' a warning is issued.
-#' \item \code{Class:} The marker's 'class'. See
-#' \url{http://www.ncbi.nlm.nih.gov/projects/SNP/snp_legend.cgi?legend=snpClass}
+#' - Class: The marker's 'class'. See
+#' <http://www.ncbi.nlm.nih.gov/projects/SNP/snp_legend.cgi?legend=snpClass>
 #' for more details.
-#' \item \code{Gene:} If the marker lies within a gene (either within the exon
+#' - Gene: If the marker lies within a gene (either within the exon
 #' or introns of a gene), the name of that gene is returned here; otherwise,
-#' \code{NA}. Note that
+#' `NA`. Note that
 #' the gene may not be returned if the marker lies too far upstream or downstream
 #' of the particular gene of interest.
-#' \item \code{Alleles:} The alleles associated with the SNP if it is a
+#' - Alleles: The alleles associated with the SNP if it is a
 #' SNV; otherwise, if it is an INDEL, microsatellite, or other kind of
 #' polymorphism the relevant information will be available here.
-#' \item \code{Major:} The major allele of the SNP, on the forward strand,
-#' given it is an SNV; otherwise, \code{NA}.
-#' \item \code{Minor:} The minor allele of the SNP, on the forward strand,
-#' given it is an SNV; otherwise, \code{NA}.
-#' \item \code{MAF:} The minor allele frequency of the SNP, given it is an SNV.
+#' - Major: The major allele of the SNP, on the forward strand,
+#' given it is an SNV; otherwise, `NA`.
+#' - Minor: The minor allele of the SNP, on the forward strand,
+#' given it is an SNV; otherwise, `NA`.
+#' - MAF: The minor allele frequency of the SNP, given it is an SNV.
 #' This is drawn from the current global reference population used by NCBI.
-#' \item \code{BP:} The chromosomal position, in base pairs, of the marker,
+#' - BP: The chromosomal position, in base pairs, of the marker,
 #' as aligned with the current genome used by dbSNP. we add 1 to the base 
 #' pair position in the BP column in the output data.frame to agree with 
-#' what the dBSNP website has.
-#' }
+#' what the dbSNP website has.
 #' 
-#' @note \code{ncbi_snp_query} is a synonym of \code{NCBI_snp_query} - we'll 
-#' make \code{NCBI_snp_query} defunct in the next version
+#' @seealso [ncbi_snp_query2()]
 #' 
-#' @seealso \code{\link{ncbi_snp_query2}}
-#' 
-#' @references \url{https://www.ncbi.nlm.nih.gov/projects/SNP/}
+#' @references <https://www.ncbi.nlm.nih.gov/projects/SNP/>
 #' 
 #' @details Note that you are limited in the number of SNPs you pass in to one 
 #' request because URLs can only be so long. Around 600 is likely the max you 
@@ -60,26 +63,15 @@
 #' ncbi_snp_query("rs332") # warning that its merged into another, try that
 #' ncbi_snp_query("rs121909001")
 #' ncbi_snp_query("rs1837253")
-#' # warning that no data available, returns 0 length data.frame
 #' ncbi_snp_query("rs1209415715")
-#' # warning that chromosomal information may be unmapped 
 #' ncbi_snp_query("rs111068718") 
-#'
-#' ncbi_snp_query(SNPs='rs9970807')$BP
+#' ncbi_snp_query(SNPs='rs9970807')
 #'
 #' # Curl debugging
 #' ncbi_snp_query("rs121909001")
-#' library("httr")
-#' ncbi_snp_query("rs121909001", config=verbose())
-#' snps <- c("rs332", "rs420358", "rs1837253", "rs1209415715", "rs111068718")
-#' ncbi_snp_query(snps, config=progress())
+#' ncbi_snp_query("rs121909001", verbose = TRUE)
 #' }
-NCBI_snp_query <- function(SNPs, ...) {
-  if (grepl("NCBI", deparse(sys.call()))) {
-    .Deprecated("ncbi_snp_query", package = "rsnps", 
-      "use ncbi_snp_query instead - NCBI_snp_query removed in next version")
-  }
-
+ncbi_snp_query <- function(SNPs, key = NULL, ...) {
   ## ensure these are rs numbers of the form rs[0-9]+
   tmp <- sapply( SNPs, function(x) { grep( "^rs[0-9]+$", x) } )
   if (any(sapply( tmp, length ) == 0)) {
@@ -89,12 +81,18 @@ NCBI_snp_query <- function(SNPs, ...) {
   }
 
   url <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-  res <- GET(url, query = list(db = 'snp', mode = 'xml', 
-                               id = paste( SNPs, collapse = ",")), ...)
-  stop_for_status(res)
-  xml <- cuf8(res)
-  xml_parsed <- xmlInternalTreeParse( xml )
-  xml_list_ <- xmlToList( xml_parsed )
+  cli <- crul::HttpClient$new(url = url, opts = list(...))
+  key <- check_key(key %||% "")
+  res <- cli$get(query = rsnps_comp(list(db = 'snp', mode = 'xml', 
+    id = paste( SNPs, collapse = ","), api_key = key)))
+  res$raise_for_status()
+  xml <- res$parse("UTF-8")
+
+  xml_parsed <- XML::xmlInternalTreeParse(xml)
+  xml_list_ <- XML::xmlToList(xml_parsed)
+
+  x2 <- xml2::read_xml(xml)
+  xml2::xml_ns_strip(x2)
 
   ## we don't need the last element; it's just metadata
   xml_list <- xml_list_[ 1:(length(xml_list_) - 1) ]
@@ -150,7 +148,9 @@ NCBI_snp_query <- function(SNPs, ...) {
     }
     my_snpClass <- tryget(my_list$.attrs["snpClass"])
 
-    my_gene <- tryget( my_list$Assembly$Component$MapLoc$FxnSet['symbol'] )
+    my_gene <- xml2::xml_attr(xml2::xml_find_first(x2, "//Assembly//Component/MapLoc/FxnSet"), 
+      "symbol")
+    # my_gene <- tryget( my_list$Assembly$Component$MapLoc$FxnSet['symbol'] )
     if (is.null(my_gene)) my_gene <- NA
     alleles <- my_list$Ss$Sequence$Observed
 
@@ -175,10 +175,6 @@ NCBI_snp_query <- function(SNPs, ...) {
         my_major <- alleles_split[ maf_allele != alleles_split ]
         my_freq <- my_list$Frequency["freq"]
       }
-      if (all(maf_allele != alleles_split) ) {
-        maf_allele <- swap( maf_allele, c("A", "C", "G", "T"), c("T", "G", "C", "A") )
-      }
-
     } else { 
       ## handle the others in a generic way; maybe specialize later
       my_minor <- NA
@@ -186,12 +182,16 @@ NCBI_snp_query <- function(SNPs, ...) {
       my_freq <- NA
     }
 
-    my_pos <- tryCatch(
-      my_list$Assembly$Component$MapLoc$.attrs["physMapInt"],
-      error = function(e) {
-        my_list$Assembly$Component$MapLoc["physMapInt"]
-      }
+    my_pos <- xml2::xml_attr(
+      xml2::xml_find_first(x2, "//Assembly//Component/MapLoc[@physMapInt]"), 
+      "physMapInt"
     )
+    # my_pos <- tryCatch(
+    #   my_list$Assembly$Component$MapLoc$.attrs["physMapInt"],
+    #   error = function(e) {
+    #     my_list$Assembly$Component$MapLoc["physMapInt"]
+    #   }
+    # )
     
     if (is.null(my_pos)) my_pos <- NA
     
@@ -212,7 +212,6 @@ NCBI_snp_query <- function(SNPs, ...) {
       as.numeric(my_freq), as.integer(my_pos),
       anc_all
     )
-
   }
 
   for (nm in c("MAF", "BP")) {
@@ -225,7 +224,3 @@ NCBI_snp_query <- function(SNPs, ...) {
   ## ensure that this limit is adhered to
   Sys.sleep(3)
 }
-
-#' @export
-#' @rdname NCBI_snp_query
-ncbi_snp_query <- NCBI_snp_query

@@ -7,9 +7,9 @@
 users(df = FALSE, ...)
 }
 \arguments{
-\item{df}{Return data.frame (TRUE) or not (FALSE) - default = FALSE.}
+\item{df}{Return data.frame (\code{TRUE}) or not (\code{FALSE}). Default: \code{FALSE}}
 
-\item{...}{Curl options passed on to \code{\link[httr]{GET}}.}
+\item{...}{Curl options passed on to \link[crul:HttpClient]{crul::HttpClient}}
 }
 \value{
 List of openSNP users, their ID numbers, and XX if available.
@@ -29,4 +29,11 @@ data[[1]] # users with links to genome data
 data[[2]] # users without links to genome data
 }
 }
-
+\seealso{
+Other opensnp-fxns: \code{\link{allgensnp}},
+  \code{\link{allphenotypes}}, \code{\link{annotations}},
+  \code{\link{download_users}},
+  \code{\link{fetch_genotypes}}, \code{\link{genotypes}},
+  \code{\link{phenotypes_byid}}, \code{\link{phenotypes}}
+}
+\concept{opensnp-fxns}

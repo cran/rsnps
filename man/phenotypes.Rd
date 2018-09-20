@@ -2,22 +2,22 @@
 % Please edit documentation in R/phenotypes.R
 \name{phenotypes}
 \alias{phenotypes}
-\title{Get phenotype data for one or multiple users.}
+\title{Get openSNP phenotype data for one or multiple users.}
 \usage{
 phenotypes(userid = NA, df = FALSE, ...)
 }
 \arguments{
 \item{userid}{ID of openSNP user.}
 
-\item{df}{Return data.frame (TRUE) or not (FALSE) - default = FALSE.}
+\item{df}{Return data.frame (\code{TRUE}) or not (\code{FALSE}). Default: \code{FALSE}}
 
-\item{...}{Curl options passed on to \code{\link[httr]{GET}}.}
+\item{...}{Curl options passed on to \link[crul:HttpClient]{crul::HttpClient}}
 }
 \value{
 List of phenotypes for specified user(s).
 }
 \description{
-Get phenotype data for one or multiple users.
+Get openSNP phenotype data for one or multiple users.
 }
 \examples{
 \dontrun{
@@ -31,9 +31,14 @@ df <- ldply(phenotypes(userid='1-8', df=TRUE))
 head(df); tail(df)
 
 # pass on curl options
-library("httr")
-# phenotypes(1, config=c(verbose(), timeout(1)))
-phenotypes(1, config=verbose())
+phenotypes(1, verbose = TRUE)
 }
 }
-
+\seealso{
+Other opensnp-fxns: \code{\link{allgensnp}},
+  \code{\link{allphenotypes}}, \code{\link{annotations}},
+  \code{\link{download_users}},
+  \code{\link{fetch_genotypes}}, \code{\link{genotypes}},
+  \code{\link{phenotypes_byid}}, \code{\link{users}}
+}
+\concept{opensnp-fxns}
