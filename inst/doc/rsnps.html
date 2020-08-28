@@ -229,7 +229,7 @@ devtools::install_github(&quot;ropensci/rsnps&quot;)
 
 <h3>All Genotypes</h3>
 
-<p>Get genotype data for all users at a particular SNP</p>
+<p>Get genotype data for all users at a particular SNP from <a href="https://opensnp.org">OpenSNP</a>:</p>
 
 <pre><code class="r">x &lt;- allgensnp(snp=&#39;rs7412&#39;)
 head(x)
@@ -266,7 +266,7 @@ head(x)
 #&gt; 6  1      Eye color             Blue            1359
 </code></pre>
 
-<p>Output a list, then call the characterisitc of interest by &#39;id&#39; or &#39;characteristic&#39;</p>
+<p>Output a list, then call the characteristic of interest by &#39;id&#39; or &#39;characteristic&#39;</p>
 
 <pre><code class="r">datalist &lt;- allphenotypes()
 </code></pre>
@@ -791,7 +791,7 @@ lapply(out, head)
 
 <h3>dbSNP</h3>
 
-<p>Query NCBI&#39;s dbSNP for information on a set of SNPs</p>
+<p>Query NCBI&#39;s <a href="https://www.ncbi.nlm.nih.gov/snp/">dbSNP</a> for information on a set of SNPs</p>
 
 <p>An example with both merged SNPs, non-SNV SNPs, regular SNPs, SNPs not found, microsatellite</p>
 
