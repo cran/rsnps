@@ -6,7 +6,7 @@ Description: A programmatic interface to various 'SNP' 'datasets'
     are included for searching for 'NCBI'. For 'OpenSNP', functions are included 
     for getting 'SNPs', and data for 'genotypes', 'phenotypes', annotations, 
     and bulk downloads of data by user.
-Version: 0.4.0
+Version: 0.5.0.0
 License: MIT + file LICENSE
 Authors@R: c(
     person("Julia", "Gustavsen", role = c("aut", "cre"),
@@ -25,16 +25,15 @@ URL: https://docs.ropensci.org/rsnps/,
 BugReports: https://github.com/ropensci/rsnps/issues/
 VignetteBuilder: knitr
 Encoding: UTF-8
-Imports: plyr, stringr, crul (>= 0.5.2), data.table, jsonlite, RJSONIO,
-        httr
-Suggests: testthat, knitr, markdown
+Imports: plyr, stringr, crul (>= 0.5.2), data.table, jsonlite, httr
+Suggests: testthat, knitr, markdown, tibble
 RoxygenNote: 7.1.1
 X-schema.org-applicationCategory: Genes
 X-schema.org-keywords: gene, snp, sequence, API, web, api-client,
         species, dbSNP, OpenSNP, NCBI, genotype
 X-schema.org-isPartOf: https://ropensci.org
 NeedsCompilation: no
-Packaged: 2020-08-28 07:51:37 UTC; juliagustavsen
+Packaged: 2022-01-28 11:34:19 UTC; juliagustavsen
 Author: Julia Gustavsen [aut, cre] (<https://orcid.org/0000-0002-4764-4802>),
   Sina Rüeger [aut] (<https://orcid.org/0000-0003-2848-9242>),
   Scott Chamberlain [aut] (<https://orcid.org/0000-0003-1444-9135>),
@@ -42,4 +41,4 @@ Author: Julia Gustavsen [aut, cre] (<https://orcid.org/0000-0002-4764-4802>),
   Hao Zhu [aut]
 Maintainer: Julia Gustavsen <j.gustavsen@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-08-28 09:50:03 UTC
+Date/Publication: 2022-01-28 11:50:02 UTC

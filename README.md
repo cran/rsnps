@@ -5,8 +5,8 @@
 
 [![cran
 checks](https://cranchecks.info/badges/worst/rsnps)](https://cranchecks.info/pkgs/rsnps/)
-[![Build
-Status](https://api.travis-ci.org/ropensci/rsnps.png)](https://travis-ci.org/ropensci/rsnps/)
+[![R build
+status](https://github.com/ropensci/rsnps/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/rsnps/actions)
 [![Build
 status](https://ci.appveyor.com/api/projects/status/d2lv98726u6t9ut5/branch/master)](https://ci.appveyor.com/project/sckott/rsnps/branch/master/)
 [![codecov.io](https://codecov.io/github/ropensci/rsnps/coverage.svg?branch=master)](https://codecov.io/github/ropensci/rsnps?branch=master)
@@ -26,20 +26,20 @@ database.
 
 This set of functions/package accesses data from:
 
-  - openSNP.org
-      - <https://opensnp.org>
-      - See documentation on the openSNP API
+-   openSNP.org
+    -   <https://opensnp.org>
+    -   See documentation on the openSNP API
         <https://opensnp.org/faq#api>
-      - See blog post about their API
+    -   See blog post about their API
         <https://opensnp.wordpress.com/2012/01/18/some-progress-on-the-api-json-endpoints/>
-      - Relevant functions:
-          - `allgensnp()`, `allphenotypes()`, `annotations()`,
+    -   Relevant functions:
+        -   `allgensnp()`, `allphenotypes()`, `annotations()`,
             `download_users()`, `fetch_genotypes()`, `genotypes()`,
             `phenotypes()`, `phenotypes_byid()`, `users()`
-  - NCBI’s dbSNP SNP database
-      - See <https://www.ncbi.nlm.nih.gov/snp/> for more details
-      - Relevant function:
-          - `ncbi_snp_query()`
+-   NCBI’s dbSNP SNP database
+    -   See <https://www.ncbi.nlm.nih.gov/snp/> for more details
+    -   Relevant function:
+        -   `ncbi_snp_query()`
 
 ## Install
 
@@ -69,26 +69,16 @@ snps <- c("rs332", "rs420358", "rs1837253", "rs1209415715", "rs111068718")
 ncbi_snp_query(snps)
 ```
 
-    #>          query chromosome        bp class         rsid          gene
-    #> 1        rs332          7 117559593   del  rs121909001 CFTR/CFTR-AS1
-    #> 2     rs420358          1  40341239   snv     rs420358              
-    #> 3    rs1837253          5 111066174   snv    rs1837253              
-    #> 4 rs1209415715          9  41782316   snv rs1209415715              
-    #>       alleles ancestral_allele variation_allele      seqname
-    #> 1 TTT, delTTT              TTT           delTTT NC_000007.14
-    #> 2     A,C,G,T                A            C,G,T NC_000001.11
-    #> 3         T,C                T                C NC_000005.10
-    #> 4         T,C                T                C NC_000009.12
-    #>                                                                               hgvs
-    #> 1                                            NC_000007.14:g.117559593_117559595del
-    #> 2 NC_000001.11:g.40341239A>C,NC_000001.11:g.40341239A>G,NC_000001.11:g.40341239A>T
-    #> 3                                                      NC_000005.10:g.111066174T>C
-    #> 4                                                       NC_000009.12:g.41782316T>C
-    #>     assembly ref_seq minor    maf
-    #> 1 GRCh38.p12    <NA>  <NA>     NA
-    #> 2 GRCh38.p12       A     C 0.8614
-    #> 3 GRCh38.p12       T     C 0.7133
-    #> 4 GRCh38.p12    <NA>  <NA>     NA
+    #> # A tibble: 4 × 16
+    #>   query        chromosome        bp class rsid   gene   alleles ancestral_allele
+    #>   <chr>        <chr>          <dbl> <chr> <chr>  <chr>  <chr>   <chr>           
+    #> 1 rs332        7          117559593 del   rs121… "CFTR… TTT, d… TTT             
+    #> 2 rs420358     1           40341239 snv   rs420… ""     A,C,G,T A               
+    #> 3 rs1837253    5          111066174 snv   rs183… ""     T,C     T               
+    #> 4 rs1209415715 9           41782316 snv   rs120… ""     T,A,C   T               
+    #> # … with 8 more variables: variation_allele <chr>, seqname <chr>, hgvs <chr>,
+    #> #   assembly <chr>, ref_seq <chr>, minor <chr>, maf <dbl>,
+    #> #   maf_population <list>
 
 ### openSNP data
 
@@ -121,16 +111,16 @@ out$phenotypes$`Hair Type`
     #> [1] "straight"
 
 For more detail, see the [vignette: rsnps
-tutorial](https://github.com/ropensci/rsnps/blob/master/inst/vign/rsnps_vignette.md).
+tutorial](https://github.com/ropensci/rsnps/tree/master/vignettes).
 
 ## Meta
 
-  - Please [report any issues or
+-   Please [report any issues or
     bugs](https://github.com/ropensci/rsnps/issues/).
-  - License: MIT
-  - Get citation information for `rsnsps` in R doing `citation(package =
-    'rsnps')`
-  - Please note that this package is released with a [Contributor Code
+-   License: MIT
+-   Get citation information for `rsnsps` in R doing
+    `citation(package = 'rsnps')`
+-   Please note that this package is released with a [Contributor Code
     of Conduct](https://ropensci.org/code-of-conduct/). By contributing
     to this project, you agree to abide by its terms.
 
